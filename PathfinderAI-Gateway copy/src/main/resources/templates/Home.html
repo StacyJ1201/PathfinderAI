@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Home Page of Travel Gig</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+	<style>
+		.slidecontainer {
+			width: 100%;
+		}
+		.slider {
+			width: 100%;
+			height: 25px;
+			background: #d3d3d3;
+			outline: none;
+			opacity: 0.7;
+			-webkit-transition: .2s;
+			transition: opacity .2s;
+		}
+		.slider:hover {
+			opacity: 1;
+		}
+	</style>
+</head>
+<body>
+<div class="container" style="margin-left:100px">
+	<h1>Welcome to Travel Gig</h1>
+	<h2>Search your desired hotel</h2>
+</div>
+
+<div class="container border rounded" style="margin:auto;padding:50px;margin-top:50px;margin-bottom:50px">
+	<h3>Narrow your search results</h3>
+	<form th:action="@{/search/hotels}" method="get" id="searchForm">
+		<div class="form-row">
+			<div class="col-3">
+				Hotel/City/State/Address
+				<input class="form-control" type="text" id="city" name="city" th:value="${searchLocation}"/>
+			</div>
+			<div class="col-2">
+				No. Rooms:
+				<input class="form-control" type="number" id="noRooms" name="noRooms"/>
+			</div>
+			<div class="col-2">
+				No. Guests:
+				<input class="form-control" type="number" id="noGuests" name="noGuests"/>
+			</div>
+			<div class="col">
+				Check-In Date:
+				<input class="form-control" type="date" id="checkInDate" name="checkInDate"/>
+			</div>
+			<div class="col">
+				Check-Out Date:
+				<input class="form-control" type="date" id="checkOutDate" name="checkOutDate"/>
+			</div>
+		</div>
+		<div class="form-row mt-3">
+			<div class="col">
+				<button type="submit" class="btn btn-primary">Search</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="container">
+	<div class="row">
+		<div class="col-3">
+			<div class="border rounded p-3">
+				<h4>Filters</h4>
+
+				<div class="mb-3">
+					<h5>Star Rating</h5>
+					<div class="form-check-inline">
+						<label class="form-check-label">
+							<input type="checkbox" class="star_rating form-check-input" value="1">1
+						</label>
+					</div>
+					<div class="form-check-inline">
+						<label class="form-check-label">
+							<input type="checkbox" class="star_rating form-check-input" value="2">2
+						</label>
+					</div>
+					<div class="form-check-inline">
+						<label class="form-check-label">
+							<input type="checkbox" class="star_rating form-check-input" value="3">3
+						</label>
+					</div>
+					<div class="form-check-inline">
+						<label class="form-check-label">
+							<input type="checkbox" class="star_rating form-check-input" value="4">4
+						</label>
+					</div>
+					<div class="form-check-inline">
+						<label class="form-check-label">
+							<input type="checkbox" class="star_rating form-check-input" value="5">5
+						</label>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<h5>Price Range</h5>
+					<div class="slidecontainer">
+						<input type="range" min="1" max="500" value="500" class="slider" id="priceRange">
+						<p>Price: $<span id="priceValue"></span></p>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<h5>Amenities</h5>
+					<div class="form-check">
+						<input type="checkbox" class="hotel_amenity form-check-input" value="PARKING">
+						<label class="form-check-label">Parking</label>
+					</div>
+					<div class="form-check">
+						<input type="checkbox" class="hotel_amenity form-check-input" value="BREAKFAST">
+						<label class="form-check-label">Breakfast</label>
+					</div>
+					<div class="form-check">
+						<input type="checkbox" class="hotel_amenity form-check-input" value="BAR OR LOUNGE">
+						<label class="form-check-label">Bar/Lounge</label>
+					</div>
+					<div class="form-check">
+						<input type="checkbox" class="hotel_amenity form-check-input" value="FITNESS CENTER">
+						<label class="form-check-label">Fitness Center</label>
+					</div>
+				</div>
+
+				<button class="btn btn-primary" id="filterBtn">Apply Filters</button>
+			</div>
+		</div>
+
+		<div class="col-9">
+			<h3>Hotel Results</h3>
+			<div id="hotelResults">
+				<div th:if="${hotels != null && !hotels.empty}">
+					<div class="card mb-3" th:each="hotel : ${hotels}">
+						<div class="row no-gutters">
+							<div class="col-md-4">
+								<img th:if="${hotel.imageURL}" th:src="${hotel.imageURL}" class="card-img" alt="Hotel Image">
+								<img th:unless="${hotel.imageURL}" src="/images/default-hotel.jpg" class="card-img" alt="Default Hotel Image">
+							</div>
+							<div class="col-md-8">
+								<div class="card-body">
+									<h5 class="card-title" th:text="${hotel.hotelName}">Hotel Name</h5>
+									<p class="card-text">
+										<span th:text="${hotel.address}"></span><br/>
+										<span th:text="${hotel.city + ', ' + hotel.state}"></span><br/>
+										Rating: <span th:text="${hotel.starRating + ' stars'}"></span><br/>
+										Average Price: $<span th:text="${hotel.averagePrice}"></span><br/>
+										<span th:if="${hotel.discount > 0}" class="text-danger">
+                                            Discount: $<span th:text="${hotel.discount}"></span>
+                                        </span>
+									</p>
+									<p class="card-text">
+										<small class="text-muted">
+											Amenities: <span th:text="${#strings.listJoin(hotel.amenities, ', ')}"></span>
+										</small>
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div th:if="${hotels == null || hotels.empty}" class="alert alert-info">
+					No hotels found matching your criteria.
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script th:inline="javascript">
+	$(document).ready(function() {
+		var slider = document.getElementById("priceRange");
+		var output = document.getElementById("priceValue");
+		output.innerHTML = slider.value;
+		slider.oninput = function() {
+			output.innerHTML = this.value;
+		}
+
+		$("#filterBtn").click(function() {
+			var selectedStars = [];
+			$('.star_rating:checked').each(function() {
+				selectedStars.push($(this).val());
+			});
+
+			var selectedAmenities = [];
+			$('.hotel_amenity:checked').each(function() {
+				selectedAmenities.push($(this).val());
+			});
+
+			var maxPrice = $("#priceRange").val();
+
+			var currentParams = new URLSearchParams(window.location.search);
+
+			if (selectedStars.length > 0) {
+				currentParams.set('starRating', selectedStars.join(','));
+			}
+			if (selectedAmenities.length > 0) {
+				currentParams.set('amenities', selectedAmenities.join(','));
+			}
+			currentParams.set('maxPrice', maxPrice);
+
+			window.location.href = window.location.pathname + '?' + currentParams.toString();
+		});
+	});
+</script>
+
+</body>
+</html>
